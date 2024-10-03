@@ -10,7 +10,7 @@ const colorScheme = useColorScheme();
 
   return (
     <Tabs
-      initialRouteName="garden"  
+      initialRouteName="index"  
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         tabBarInactiveTintColor: '#234425', // Darker green for inactive icons
@@ -32,7 +32,7 @@ const colorScheme = useColorScheme();
 
       {/* Garden Tab */}
       <Tabs.Screen
-        name="garden"  
+        name="index"  
         options={{
           title: 'Garden',
           tabBarIcon: ({ color, focused }) => (

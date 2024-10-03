@@ -14,14 +14,21 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { Button, Provider as PaperProvider } from 'react-native-paper';
 import { useNavigation, useRoute, RouteProp, NavigationProp } from '@react-navigation/native';
+import { createTable, insertImage, getImages } from '@/app/utils/database';
 
 // Define the type for the route parameters
 type RootStackParamList = {
   addPhoto: {
     autoOpen?: boolean;
+  index: {
+    images: { name: string; uri: string }[];
   };
+};
   garden: undefined;
   badges: undefined;
+index: {
+  images: { name: string; uri: string }[];
+};
 };
 
 type AddPhotoScreenRouteProp = RouteProp<RootStackParamList, 'addPhoto'>;
@@ -34,6 +41,7 @@ export default function AddPhotoScreen() {
   const [plantName, setPlantName] = useState<string>(''); // Plant Name
   const navigation = useNavigation<NavigationProp<RootStackParamList>>(); // Use navigation hook with proper type
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null); //loading message
+
   // Automatically trigger add photo dialog if navigated with param `autoOpen`
 /*   useEffect(() => {
     if (route.params?.autoOpen) {
@@ -137,14 +145,33 @@ export default function AddPhotoScreen() {
     }
   };
 
-  // Handle Save to Garden button press
-  const handleSaveToGarden = () => {
-    setLoadingMessage('Saving to garden...');
-    setTimeout(() => {
-      setLoadingMessage(null);
-      setImage(null); // Clear the image from the view
-      navigation.navigate('garden');
-    }, 500); // Wait for 1 second before navigating
+// Create the table when the component mounts
+useEffect(() => {
+  createTable();
+}, []);
+
+// Handle Save to Garden button press
+  const handleSaveToGarden = async () => {
+    if (image && plantName) {
+      try {
+        // Insert the image URI into the database
+        await insertImage(plantName, image);
+        setLoadingMessage('Saving to garden...');
+
+        // Fetch the updated list of images
+        getImages((images) => {
+          setLoadingMessage(null);
+          setImage(null); // Clear the image from the view
+          setPlantName(''); // Clear the plant name
+          navigation.navigate('index', { images }); // Pass the updated images to the garden screen
+        });
+      } catch (error) {
+        console.error('Error saving to garden:', error);
+        alert('An error occurred while saving to garden');
+      }
+    } else {
+      alert('Please select an image and enter a plant name.');
+    }
   };
 
   return (

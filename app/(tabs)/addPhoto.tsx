@@ -9,6 +9,7 @@ import {
   Dimensions,
   ActionSheetIOS,
   InteractionManager,
+  TextInput,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Button, Provider as PaperProvider } from 'react-native-paper';
@@ -30,6 +31,7 @@ export default function AddPhotoScreen() {
   const [image, setImage] = useState<string | null>(null);
   const [imageHeight, setImageHeight] = useState<number>(screenWidth / 2); // Default height
   const route = useRoute<AddPhotoScreenRouteProp>(); // Use the type with the route
+  const [plantName, setPlantName] = useState<string>(''); // Plant Name
   const navigation = useNavigation<NavigationProp<RootStackParamList>>(); // Use navigation hook with proper type
 
   // Automatically trigger add photo dialog if navigated with param `autoOpen`
@@ -147,7 +149,12 @@ export default function AddPhotoScreen() {
           )}
         </View>
         <View style={styles.textContainer}>
-          <Text style={styles.mainText}>Name of plant</Text>
+          <TextInput
+            style={styles.mainText}
+            placeholder="Enter plant name"
+            value={plantName}
+            onChangeText={setPlantName}
+          />
           <Text style={styles.secondaryText}>information</Text>
         </View>
 

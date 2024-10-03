@@ -33,9 +33,9 @@ export default function AddPhotoScreen() {
   const route = useRoute<AddPhotoScreenRouteProp>(); // Use the type with the route
   const [plantName, setPlantName] = useState<string>(''); // Plant Name
   const navigation = useNavigation<NavigationProp<RootStackParamList>>(); // Use navigation hook with proper type
-
+  const [loadingMessage, setLoadingMessage] = useState<string | null>(null); //loading message
   // Automatically trigger add photo dialog if navigated with param `autoOpen`
-  useEffect(() => {
+/*   useEffect(() => {
     if (route.params?.autoOpen) {
       InteractionManager.runAfterInteractions(() => {
         setTimeout(() => {
@@ -43,7 +43,7 @@ export default function AddPhotoScreen() {
         }, 100); // Small delay to ensure everything has settled
       });
     }
-  }, [route.params]);
+  }, [route.params]); */
 
   // Handle opening camera or gallery specific to platform
   //ios first
@@ -137,6 +137,16 @@ export default function AddPhotoScreen() {
     }
   };
 
+  // Handle Save to Garden button press
+  const handleSaveToGarden = () => {
+    setLoadingMessage('Saving to garden...');
+    setTimeout(() => {
+      setLoadingMessage(null);
+      setImage(null); // Clear the image from the view
+      navigation.navigate('garden');
+    }, 500); // Wait for 1 second before navigating
+  };
+
   return (
     <PaperProvider>
       <View style={styles.container}>
@@ -161,7 +171,8 @@ export default function AddPhotoScreen() {
         {/* Save to Garden Button */}
         <Button
           mode="contained-tonal"
-          onPress={() => alert('Saving to garden...')}
+          onPress={handleSaveToGarden}
+          disabled={!image} // Disable button if no image is loaded
           style={styles.saveGardenButton}
         >
           Save to Garden
@@ -175,6 +186,14 @@ export default function AddPhotoScreen() {
         >
           Scan Plant
         </Button>
+
+        {/* Loading Message */}
+        {loadingMessage && (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>{loadingMessage}</Text>
+          </View>
+        )}
+
       </View>
     </PaperProvider>
   );
@@ -241,5 +260,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#6eba70', 
     paddingHorizontal: 0,
     flex: 1,
+  },
+
+// Loading message styles
+  loadingContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -50 }, { translateY: -50 }],
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    padding: 10,
+    borderRadius: 5,
+  },
+  loadingText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
